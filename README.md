@@ -277,7 +277,7 @@ Main-Menu
 
 ### Impossibilité de connection au domaine:
 
-!https://cdn.discordapp.com/attachments/833768718218821655/1250442705545465888/image.png?ex=666af505&is=6669a385&hm=6b132ba3129a7baa394d7ce9711365d210fb0a4e954a92bc9a80061b395ce3a1&
+https://cdn.discordapp.com/attachments/833768718218821655/1250442705545465888/image.png?ex=666af505&is=6669a385&hm=6b132ba3129a7baa394d7ce9711365d210fb0a4e954a92bc9a80061b395ce3a1&
 
 <aside>
 💡 solution:
