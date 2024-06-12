@@ -1,15 +1,16 @@
-## Objectif:
+## Objectif
 
 - Pouvoir changer le nom de la machine
 - Modifier IP/Netmask/Passerelle/DNS
 - Joindre un domaine
 - Installer Chocolatey
 
-## lien des scriptes
-scripte de configuration: https://github.com/Skream20/script-Conf/blob/2d00d0a1b5d0c784136888bacfd4874842ed3d64/Machine_conf.ps1
-scripte d'activation AD/AAD: https://github.com/Skream20/script-Conf/blob/2d00d0a1b5d0c784136888bacfd4874842ed3d64/DesyncAD.psi
+## Lien des scripts
 
-## **Fonctionnement du script :**
+Script de configuration : https://github.com/Skream20/script-Conf/blob/2d00d0a1b5d0c784136888bacfd4874842ed3d64/Machine_conf.ps1
+Script d'activation AD/AAD : https://github.com/Skream20/script-Conf/blob/2d00d0a1b5d0c784136888bacfd4874842ed3d64/DesyncAD.psi
+
+## Fonctionnement du script
 
 ### Set-Name
 
@@ -25,7 +26,6 @@ function Set-Name {
 
     Rename-Computer -NewName $PCName -Force
 }
-
 ```
 
 ### Validate-SubnetMask
@@ -46,7 +46,6 @@ function Validate-SubnetMask {
 
     return $subnetMasks[$SubnetMask]
 }
-
 ```
 
 ### Change-InterfaceAlias
@@ -77,7 +76,6 @@ function Change-InterfaceAlias {
 
     return $DesiredAlias
 }
-
 ```
 
 ### Set-IPConfig
@@ -105,7 +103,7 @@ function Set-IPConfig {
     Set-Name -PCName $PCName
 
     # Determine netmask
-    $PrefixLength = if ($PrefixLengthOrSubnetMask -match '^\\d+$') {
+    $PrefixLength = if ($PrefixLengthOrSubnetMask -match '^\d+$') {
         [int]$PrefixLengthOrSubnetMask
     } else {
         Validate-SubnetMask -SubnetMask $PrefixLengthOrSubnetMask
@@ -117,13 +115,13 @@ function Set-IPConfig {
     }
 
     try {
-        # Remove ip
+        # Remove IP
         $existingIPs = Get-NetIPAddress -InterfaceAlias $InterfaceAlias
         foreach ($ip in $existingIPs) {
             Remove-NetIPAddress -IPAddress $ip.IPAddress -Confirm:$false
         }
 
-        # Remove dns
+        # Remove DNS
         Set-DnsClientServerAddress -InterfaceAlias $InterfaceAlias -ResetServerAddresses
 
         # Set IP address/netmask
@@ -138,7 +136,6 @@ function Set-IPConfig {
 
     return $true
 }
-
 ```
 
 ### Configure-IP
@@ -166,7 +163,7 @@ function Configure-IP {
     $prefixLengthOrSubnetMask = "255.255.0.0"
     $newGateway = "10.0.255.254"
     $dnsInput = "10.0.0.11"
-    $dnsServers = $dnsInput -split ',\\s*'
+    $dnsServers = $dnsInput -split ',\s*'
 
     if (Set-IPConfig -PCName $name -IPAddress $newIPAddress -PrefixLengthOrSubnetMask $prefixLengthOrSubnetMask -Gateway $newGateway -DNSServers $dnsServers -InterfaceAlias $interfaceAlias) {
         # Verify changes
@@ -186,16 +183,13 @@ function Configure-IP {
         Write-Warning "Failed to set IP configuration."
     }
 }
-
 ```
 
 ### Join-Domain
 
 - **Fonction** : Ajoute l'ordinateur à un domaine.
 - **Paramètres** : `$DomainName`, `$DomainUser`, `$DomainPassword`, `$OU` (optionnel).
-- **Action** : Utilise `Add-Computer` pour ajouter l'
-
-ordinateur au domaine spécifié en utilisant les informations d'authentification fournies, puis redémarre l'ordinateur.
+- **Action** : Utilise `Add-Computer` pour ajouter l'ordinateur au domaine spécifié en utilisant les informations d'authentification fournies, puis redémarre l'ordinateur.
 
 ```powershell
 function Join-Domain {
@@ -220,7 +214,6 @@ function Join-Domain {
         Write-Warning "An error occurred: $_"
     }
 }
-
 ```
 
 ### Install-Chocolatey
@@ -234,7 +227,6 @@ function Install-Chocolatey {
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('<https://community.chocolatey.org/install.ps1>'))
 }
-
 ```
 
 ### Main-Menu
@@ -242,7 +234,9 @@ function Install-Chocolatey {
 - **Fonction** : Menu principal pour choisir l'opération à effectuer.
 - **Action** :
     - Affiche les options disponibles à l'utilisateur.
-    - Demande à l'utilisateur de choisir une option.
+    - Demande à l'utilisateur de choisir
+
+ une option.
     - Appelle la fonction correspondante en fonction du choix de l'utilisateur (Configurer IP, rejoindre un domaine ou installer Chocolatey).
 
 ```powershell
@@ -273,29 +267,27 @@ function Main-Menu {
 }
 
 Main-Menu
-
 ```
-## problème / solution
 
-### Impossibilité de connection au domaine:
+## Problème / Solution
+
+### Impossibilité de connexion au domaine
 
 ```
 AVERTISSEMENT : An error occurred: L'ordinateur « hj » 
-n'a pas pu joindre le domaine « estransup. local .
+n'a pas pu joindre le domaine « estransup.local » 
 à partir de son groupe de travail actuel « WORKGROUP » avec le message 
-d'erreur suivant : Cet appareil est joint à Azure AD, 
-Pour joindre un domaine Active Directory,
-vous devez d'abord accéder aux paramètres
- et déconnecter votre appareil de votre réseau professionnel ou scolaire.
-
+d'erreur suivant : Cet appareil est joint à Azure AD. 
+Pour joindre un domaine Active Directory, 
+vous devez d'abord accéder aux paramètres 
+et déconnecter votre appareil de votre réseau professionnel ou scolaire.
 ```
 
-<aside>
-💡 solution:
+💡 Solution :
 
-Le responsable de cette erreur est le service Azure Active Directory et Service Azure Directory sur windows 11 mis en place de façon automatique. AAD et service AD. Pour modifier le domaine, il faut donc désactiver le service  AAD puis “unjoin” de Azure AD.
+Le responsable de cette erreur est le service Azure Active Directory et Service Azure Directory sur Windows 11 mis en place de façon automatique. Pour modifier le domaine, il faut donc désactiver le service AAD puis “unjoin” de Azure AD.
 
-le script ci-dessous désactive et “unjoin” du service AD 
+Le script ci-dessous désactive et “unjoin” du service AD :
 
 ```powershell
 # Disable AAD-related services
@@ -325,16 +317,14 @@ Invoke-Command -ScriptBlock {
         Write-Output "Device is not joined to Azure AD."
     }
 }
-
 ```
 
 1. **Désactiver et arrêter les services** :
     - Le script itère sur les services spécifiés (`DsmSvc` et `wlidsvc`).
     - Pour chaque service, il essaie de définir le type de démarrage sur `Disabled` et ensuite d'arrêter le service.
     - Les erreurs rencontrées durant ces opérations sont capturées et enregistrées en tant qu'avertissements.
+
 2. **Désinscrire l'appareil d'Azure AD** :
     - Le script vérifie si l'appareil est actuellement inscrit à Azure AD en utilisant la cmdlet `Get-WmiObject`.
     - Si l'appareil est inscrit, il exécute `dsregcmd /leave` pour désinscrire l'appareil.
     - Les erreurs durant le processus de désinscription sont également capturées et enregistrées en tant qu'avertissements.
-
-</aside>
