@@ -273,3 +273,58 @@ function Main-Menu {
 Main-Menu
 
 ```
+## problème / solution
+
+### Impossibilité de connection au domaine:
+
+!https://cdn.discordapp.com/attachments/833768718218821655/1250442705545465888/image.png?ex=666af505&is=6669a385&hm=6b132ba3129a7baa394d7ce9711365d210fb0a4e954a92bc9a80061b395ce3a1&
+
+<aside>
+💡 solution:
+
+Le responsable de cette erreur est le service Azure Active Directory et Service Azure Directory sur windows 11 mis en place de façon automatique. AAD et service AD. Pour modifier le domaine, il faut donc désactiver le service  AAD puis “unjoin” de Azure AD.
+
+le script ci-dessous désactive et “unjoin” du service AD 
+
+```powershell
+# Disable AAD-related services
+Invoke-Command -ScriptBlock {
+    $services = @(
+        "DsmSvc",    # User Device Registration
+        "wlidsvc"    # Microsoft Account Sign-in Assistant
+    )
+    foreach ($service in $services) {
+        try {
+            Set-Service -Name $service -StartupType Disabled -ErrorAction Stop
+            Stop-Service -Name $service -Force -ErrorAction Stop
+            Write-Output "Service $service has been disabled and stopped."
+        } catch {
+            Write-Warning "Failed to disable or stop service $service: $_"
+        }
+    }
+}
+
+# Unjoin the device from Azure AD
+Invoke-Command -ScriptBlock {
+    $aadJoined = (Get-WmiObject -Namespace "root\cimv2\mdm\dmmap" -Class MDM_DevDetail_Ext01).IsAzureJoined
+    if ($aadJoined) {
+        dsregcmd /leave
+        Write-Output "Device has been unjoined from Azure AD."
+    } else {
+        Write-Output "Device is not joined to Azure AD."
+    }
+}
+
+```
+
+1. **Désactiver et arrêter les services** :
+    - Le script itère sur les services spécifiés (`DsmSvc` et `wlidsvc`).
+    - Pour chaque service, il essaie de définir le type de démarrage sur `Disabled` et ensuite d'arrêter le service.
+    - Les erreurs rencontrées durant ces opérations sont capturées et enregistrées en tant qu'avertissements.
+2. **Désinscrire l'appareil d'Azure AD** :
+    - Le script vérifie si l'appareil est actuellement inscrit à Azure AD en utilisant la cmdlet `Get-WmiObject`.
+    - Si l'appareil est inscrit, il exécute `dsregcmd /leave` pour désinscrire l'appareil.
+    - Les erreurs durant le processus de désinscription sont également capturées et enregistrées en tant qu'avertissements.
+
+</aside>
+
