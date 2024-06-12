@@ -6,6 +6,8 @@
 - Installer Chocolatey
 
 ## lien des scriptes
+scripte de configuration: https://github.com/Skream20/script-Conf/blob/2d00d0a1b5d0c784136888bacfd4874842ed3d64/Machine_conf.ps1
+scripte d'activation AD/AAD: https://github.com/Skream20/script-Conf/blob/2d00d0a1b5d0c784136888bacfd4874842ed3d64/DesyncAD.psi
 
 ## **Fonctionnement du script :**
 
