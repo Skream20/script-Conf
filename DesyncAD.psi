@@ -1,0 +1,27 @@
+# Disable AAD-related services
+Invoke-Command -ScriptBlock {
+    $services = @(
+        "DsmSvc",    # User Device Registration
+        "wlidsvc"    # Microsoft Account Sign-in Assistant
+    )
+    foreach ($service in $services) {
+        try {
+            Set-Service -Name $service -StartupType Disabled -ErrorAction Stop
+            Stop-Service -Name $service -Force -ErrorAction Stop
+            Write-Output "Service $service has been disabled and stopped."
+        } catch {
+            Write-Warning "Failed to disable or stop service $service: $_"
+        }
+    }
+}
+
+# Unjoin the device from Azure AD
+Invoke-Command -ScriptBlock {
+    $aadJoined = (Get-WmiObject -Namespace "root\cimv2\mdm\dmmap" -Class MDM_DevDetail_Ext01).IsAzureJoined
+    if ($aadJoined) {
+        dsregcmd /leave
+        Write-Output "Device has been unjoined from Azure AD."
+    } else {
+        Write-Output "Device is not joined to Azure AD."
+    }
+}
