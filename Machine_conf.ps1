@@ -156,33 +156,33 @@ function Install-Chocolatey {
         Write-Warning "An error occurred during Chocolatey installation: $_"
     }
 }
-
 function Main-Menu {
-    Write-Output "Choose an operation:"
-    Write-Output "1. Configure IP and Set PC Name"
-    Write-Output "2. Join Domain"
-    Write-Output "3. Install Chocolatey"
+    while ($true) {
+        Write-Output "Select an option:"
+        Write-Output "1. Configure IP"
+        Write-Output "2. Join Domain"
+        Write-Output "3. Install Chocolatey"
+        Write-Output "4. Exit"
 
-    $choice = Read-Host "Enter your choice (1, 2, or 3)"
+        $choice = Read-Host "Enter your choice (1/2/3/4)"
 
-    switch ($choice) {
-        1 {
-            Configure-IP
-        }
-        2 {
-            $domainName = "estransup.local"
-            $domainUser = Read-Host "Enter the domain user"
-            $domainPassword = Read-Host "Enter the domain password"
-            Join-Domain -DomainName $domainName -DomainUser $domainUser -DomainPassword $domainPassword 
-        }
-        3 {
-            Install-Chocolatey
-        }
-        default {
-            Write-Output "Invalid choice. Please run the script again and select a valid option."
+        switch ($choice) {
+            1 { Configure-IP }
+            2 {
+                $domainName = "estransup.local"
+                $domainUser = Read-Host "Enter Domain User"
+                $domainPassword = Read-Host "Enter Domain Password"
+                $ou = Read-Host "Enter OU (optional, press enter to skip)"
+                Join-Domain -DomainName $domainName -DomainUser $domainUser -DomainPassword $domainPassword -OU $ou
+            }
+            3 { Install-Chocolatey }
+            4 { break }
+            default { Write-Warning "Invalid choice, please try again." }
         }
     }
 }
+
+Main-Menu
 
 # Display the main 
 Main-Menu
