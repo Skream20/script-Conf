@@ -169,7 +169,7 @@ function Main-Menu {
         switch ($choice) {
             1 { Configure-IP }
             2 {
-                $domainName = "estransup.local"
+                $domainName = "*****.local" #add domain name
                 $domainUser = Read-Host "Enter Domain User"
                 $domainPassword = Read-Host "Enter Domain Password"
                 $ou = Read-Host "Enter OU (optional, press enter to skip)"
