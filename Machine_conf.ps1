@@ -100,9 +100,9 @@ function Configure-IP {
     $post = Read-Host "Enter post"
     $name = "D" + $salle + "-Po" + $post
     $newIPAddress = "10.0." + $salle + "." + $post
-    $prefixLengthOrSubnetMask = "255.255.0.0"
-    $newGateway = "10.0.255.254"
-    $dnsInput = "10.0.0.11"
+    $prefixLengthOrSubnetMask = "" #add your subnetMask
+    $newGateway = "" #add gateway
+    $dnsInput = "" #add dns 
     $dnsServers = $dnsInput -split ',\s*'
 
     if (Set-IPConfig -PCName $name -IPAddress $newIPAddress -PrefixLengthOrSubnetMask $prefixLengthOrSubnetMask -Gateway $newGateway -DNSServers $dnsServers -InterfaceAlias $interfaceAlias) {
