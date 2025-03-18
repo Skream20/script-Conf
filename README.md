@@ -277,7 +277,7 @@ Main-Menu
 
 ```
 AVERTISSEMENT : An error occurred: L'ordinateur « hj » 
-n'a pas pu joindre le domaine « estransup.local » 
+n'a pas pu joindre le domaine « ******.local » 
 à partir de son groupe de travail actuel « WORKGROUP » avec le message 
 d'erreur suivant : Cet appareil est joint à Azure AD. 
 Pour joindre un domaine Active Directory, 
